@@ -11,10 +11,10 @@
   <ion-item>
     <ion-label>Birth date</ion-label>
     <ion-button id="date-picker-button" fill="clear" slot="end">
-      {{referenceDate.toISOString() | date: 'dd.MM.YYYY HH:mm:ss'}}
+      {{referenceDate.toISOString() | date: 'dd.MM.YYYY HH:mm'}}
     </ion-button>
 
-    <ion-button (click)="onClickOnManualEntry()" shape="round" slot="end">
+    <ion-button (click)="onClickOnManualEntry()" shape="round" slot="end" size="small">
       <ion-icon name="create-outline"></ion-icon>
     </ion-button>
   </ion-item>

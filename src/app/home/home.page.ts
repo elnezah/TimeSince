@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonPopover } from '@ionic/angular';
+import { AlertController, IonPopover } from '@ionic/angular';
 import * as dayjs from 'dayjs';
+import * as customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+
 
 interface KeyDateCard {
   title: string;
@@ -17,9 +20,6 @@ interface KeyDateCard {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-onClickOnManualEntry() {
-throw new Error('Method not implemented.');
-}
   private static readonly TAG = 'HomePage';
 
   @ViewChild('refDatePickerPopOver') refDatePickerPopOver:
@@ -59,12 +59,14 @@ throw new Error('Method not implemented.');
     },
   ];
 
-  public constructor() {}
+  public constructor(private alertController: AlertController) {
+  }
 
   public ngOnInit(): void {
     this.refresh();
   }
 
+  //region Listeners
   public onReferenceDateChange($event: Event): void {
     this.refDatePickerPopOver?.dismiss();
 
@@ -76,6 +78,53 @@ throw new Error('Method not implemented.');
     this.refresh();
   }
 
+  public async onClickOnManualEntry(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Enter a date',
+      inputs: [
+        {
+          name: 'date',
+          placeholder: '21-10-1998',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'ion-color-danger',
+        },
+        {
+          text: 'Ok',
+          role: 'ok',
+        },
+      ],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss();
+    if (role === 'cancel') {
+      return;
+    }
+
+    try {
+      console.log('date', data.values.date);
+      this.referenceDate = dayjs('21-10-1998', [
+        'DD-MM-YYYY',
+        'D-MM-YYYY',
+        'DD-M-YYYY',
+        'D-M-YYYY',
+        'DD-MM-YY',
+        'D-MM-YY',
+        'DD-M-YY',
+        'D-M-YY',
+      ]);
+    } catch {
+      console.error('Invalid date', data);
+    }
+
+    this.refresh();
+  }
+  //endregion
+
   public isPast(d: dayjs.Dayjs | undefined): boolean {
     if (!d) {
       return false;
@@ -86,7 +135,6 @@ throw new Error('Method not implemented.');
 
   private refresh() {
     this.keyDates.forEach((keyDate) => {
-      console.log(HomePage.TAG, 'refresh', keyDate);
       keyDate.date = this.referenceDate.add(
         keyDate.adder.amount,
         keyDate.adder.unit
