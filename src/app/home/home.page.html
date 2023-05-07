@@ -7,14 +7,29 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Fist item (date picker) -->
+  <ion-item>
+    <ion-label>Birth date</ion-label>
+    <ion-button id="date-picker-button" fill="clear" slot="end">
+      {{referenceDate.toISOString() | date: 'dd.MM.YYYY HH:mm:ss'}}
+    </ion-button>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+    <ion-button (click)="onClickOnManualEntry()" shape="round" slot="end">
+      <ion-icon name="create-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+  <ion-popover trigger="date-picker-button" #refDatePickerPopOver>
+    <ng-template>
+      <ion-datetime presentation="date-time" [value]="referenceDate.toISOString()" size="cover"
+        (ionChange)="onReferenceDateChange($event)"></ion-datetime>
+    </ng-template>
+  </ion-popover>
+
+  <!-- Cards with future key dates -->
+  <ion-card *ngFor="let keyDate of keyDates">
+    <ion-card-header>
+      <ion-card-title>You {{isPast(keyDate.date) ? 'reached': 'will reach'}} {{keyDate.title}} on</ion-card-title>
+      <ion-card-subtitle>{{keyDate.date?.toISOString() | date: 'dd.MM.YYYY'}}</ion-card-subtitle>
+    </ion-card-header>
+  </ion-card>
 </ion-content>
