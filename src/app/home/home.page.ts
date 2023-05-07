@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover } from '@ionic/angular';
+import { AlertController, IonPopover, ModalController } from '@ionic/angular';
 import * as dayjs from 'dayjs';
 import * as customParseFormat from 'dayjs/plugin/customParseFormat';
+import { CardEditorComponent } from '../modals/card-editor/card-editor.component';
 dayjs.extend(customParseFormat);
-
 
 interface KeyDateCard {
   title: string;
@@ -59,8 +59,10 @@ export class HomePage implements OnInit {
     },
   ];
 
-  public constructor(private alertController: AlertController) {
-  }
+  public constructor(
+    private alertController: AlertController,
+    private modalController: ModalController
+  ) {}
 
   public ngOnInit(): void {
     this.refresh();
@@ -106,8 +108,7 @@ export class HomePage implements OnInit {
     }
 
     try {
-      console.log('date', data.values.date);
-      this.referenceDate = dayjs('21-10-1998', [
+      this.referenceDate = dayjs(data.values.date, [
         'DD-MM-YYYY',
         'D-MM-YYYY',
         'DD-M-YYYY',
@@ -121,6 +122,22 @@ export class HomePage implements OnInit {
       console.error('Invalid date', data);
     }
 
+    this.refresh();
+  }
+
+  public async onClickOnAdd(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: CardEditorComponent,
+    });
+    await modal.present();
+    const { role, data } = await modal.onDidDismiss();
+    if (role === 'cancel') {
+      return;
+    }
+
+    console.log(HomePage.TAG, 'onClickOnAdd', {data, role});
+
+    this.keyDates.push(data);
     this.refresh();
   }
   //endregion

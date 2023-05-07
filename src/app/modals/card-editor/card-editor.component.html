@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="onClickOnCancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Card editor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-input label="Amount" type="number" placeholder="100" [value]="amount"
+    (ionChange)="onAmountChange($event)"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-select label="Multiplier" interface="popover" placeholder="thousand" [value]="selectedMultiplier"
+      (ionChange)="onSelectedMultiplier($event)">
+      <ion-select-option *ngFor="let multiplier of multipliers" [value]="multiplier">
+        {{multiplier.name}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-select label="Unit" interface="popover" placeholder="days" [value]="selectedUnit"
+      (ionChange)="onUnitChange($event)">
+      <ion-select-option *ngFor="let unit of units" [value]="unit">
+        {{unit}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item></ion-content>
+
+<ion-footer class="ion-padding ion-no-border">
+  <ion-button (click)="onClickOnSave()" expand="block" fill="solid" shape="round">
+    Save
+  </ion-button>
+</ion-footer>

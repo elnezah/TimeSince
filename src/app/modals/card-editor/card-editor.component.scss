@@ -1,0 +1,7 @@
+ion-input {
+  text-align: right;
+}
+
+ion-input::part(label) {
+  text-align: left;
+}
