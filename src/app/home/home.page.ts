@@ -1,18 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonPopover, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
 import * as dayjs from 'dayjs';
 import * as customParseFormat from 'dayjs/plugin/customParseFormat';
-import { CardEditorComponent } from '../modals/card-editor/card-editor.component';
+import {
+  StorageService,
+  prefIndividualCard,
+  prefIndividualReferenceDate,
+} from '../services/storage.service';
+import { SingleDateCard } from '../components/single-date/single-date.component';
 dayjs.extend(customParseFormat);
-
-interface KeyDateCard {
-  title: string;
-  adder: {
-    amount: number;
-    unit: dayjs.ManipulateType;
-  };
-  date?: dayjs.Dayjs;
-}
 
 @Component({
   selector: 'app-home',
@@ -22,13 +17,8 @@ interface KeyDateCard {
 export class HomePage implements OnInit {
   private static readonly TAG = 'HomePage';
 
-  @ViewChild('refDatePickerPopOver') refDatePickerPopOver:
-    | IonPopover
-    | undefined;
-
-  public readonly today = dayjs();
   public referenceDate = dayjs('1978-02-17');
-  public keyDates: KeyDateCard[] = [
+  public cards: SingleDateCard[] = [
     {
       title: '1.000 days',
       adder: {
@@ -59,103 +49,33 @@ export class HomePage implements OnInit {
     },
   ];
 
-  public constructor(
-    private alertController: AlertController,
-    private modalController: ModalController
-  ) {}
+  public constructor(private storageService: StorageService) {}
 
-  public ngOnInit(): void {
-    this.refresh();
+  public async ngOnInit(): Promise<void> {
+    const rd = await this.storageService.get(prefIndividualReferenceDate);
+    if (rd && rd instanceof String) {
+      this.referenceDate = dayjs(rd as string);
+    }
+
+    const c = await this.storageService.get(prefIndividualCard);
+    if (c && c instanceof Array) {
+      this.cards = c as SingleDateCard[];
+    }
+
+    console.log(HomePage.TAG, 'ngOnInit', {rd, c});
   }
 
   //region Listeners
-  public onReferenceDateChange($event: Event): void {
-    this.refDatePickerPopOver?.dismiss();
 
-    if (!($event instanceof CustomEvent)) {
-      return;
-    }
-
-    this.referenceDate = dayjs($event.detail.value);
-    this.refresh();
+  public async onSingleDateReferenceDateChange(): Promise<void> {
+    await this.storageService.set(
+      prefIndividualReferenceDate,
+      this.referenceDate.toISOString()
+    );
   }
 
-  public async onClickOnManualEntry(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Enter a date',
-      inputs: [
-        {
-          name: 'date',
-          placeholder: '21-10-1998',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'ion-color-danger',
-        },
-        {
-          text: 'Ok',
-          role: 'ok',
-        },
-      ],
-    });
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss();
-    if (role === 'cancel') {
-      return;
-    }
-
-    try {
-      this.referenceDate = dayjs(data.values.date, [
-        'DD-MM-YYYY',
-        'D-MM-YYYY',
-        'DD-M-YYYY',
-        'D-M-YYYY',
-        'DD-MM-YY',
-        'D-MM-YY',
-        'DD-M-YY',
-        'D-M-YY',
-      ]);
-    } catch {
-      console.error('Invalid date', data);
-    }
-
-    this.refresh();
-  }
-
-  public async onClickOnAdd(): Promise<void> {
-    const modal = await this.modalController.create({
-      component: CardEditorComponent,
-    });
-    await modal.present();
-    const { role, data } = await modal.onDidDismiss();
-    if (role === 'cancel') {
-      return;
-    }
-
-    console.log(HomePage.TAG, 'onClickOnAdd', {data, role});
-
-    this.keyDates.push(data);
-    this.refresh();
+  public async onCardsChange(): Promise<void> {
+    await this.storageService.set(prefIndividualCard, this.cards);
   }
   //endregion
-
-  public isPast(d: dayjs.Dayjs | undefined): boolean {
-    if (!d) {
-      return false;
-    }
-
-    return d.isBefore(this.today);
-  }
-
-  private refresh() {
-    this.keyDates.forEach((keyDate) => {
-      keyDate.date = this.referenceDate.add(
-        keyDate.adder.amount,
-        keyDate.adder.unit
-      );
-    });
-  }
 }

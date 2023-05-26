@@ -7,35 +7,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Fist item (date picker) -->
-  <ion-item>
-    <ion-label>Birth date</ion-label>
-    <ion-button id="date-picker-button" fill="clear" slot="end">
-      {{referenceDate.toISOString() | date: 'dd.MM.YYYY HH:mm'}}
-    </ion-button>
-
-    <ion-button (click)="onClickOnManualEntry()" shape="round" slot="end" size="small">
-      <ion-icon name="create-outline"></ion-icon>
-    </ion-button>
-  </ion-item>
-  <ion-popover trigger="date-picker-button" #refDatePickerPopOver>
-    <ng-template>
-      <ion-datetime presentation="date-time" [value]="referenceDate.toISOString()" size="cover"
-        (ionChange)="onReferenceDateChange($event)"></ion-datetime>
-    </ng-template>
-  </ion-popover>
-
-  <!-- Cards with future key dates -->
-  <ion-card *ngFor="let keyDate of keyDates">
-    <ion-card-header>
-      <ion-card-title>You {{isPast(keyDate.date) ? 'reached': 'will reach'}} {{keyDate.title}} on</ion-card-title>
-      <ion-card-subtitle>{{keyDate.date?.toISOString() | date: 'dd.MM.YYYY'}}</ion-card-subtitle>
-    </ion-card-header>
-  </ion-card>
+  <app-single-date [(referenceDate)]="referenceDate" [(cards)]="cards"
+  (cardsChange)="onCardsChange()" (referenceDateChange)="onSingleDateReferenceDateChange()"></app-single-date>
 </ion-content>
-
-<ion-footer class="ion-padding ion-no-border">
-  <ion-button (click)="onClickOnAdd()" expand="block" fill="outline" shape="round">
-    <ion-icon name="add"></ion-icon>
-  </ion-button>
-</ion-footer>

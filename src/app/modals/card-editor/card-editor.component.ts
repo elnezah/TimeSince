@@ -34,7 +34,7 @@ export class CardEditorComponent implements OnInit {
   }
 
   public async onClickOnCancel(): Promise<void> {
-    await this.modalController.dismiss('cancel');
+    await this.modalController.dismiss(null, 'cancel');
   }
 
   public async onClickOnSave(): Promise<void> {
