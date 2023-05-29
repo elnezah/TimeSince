@@ -3,6 +3,8 @@ import { Preferences } from '@capacitor/preferences';
 
 export const prefIndividualReferenceDate = 'prefIndividualReferenceDate';
 export const prefIndividualCard = 'prefIndividualCard';
+export const prefMultipleReferenceDate = 'prefMultipleReferenceDate';
+export const prefMultipleCard = 'prefMultipleCard';
 
 @Injectable({
   providedIn: 'root',

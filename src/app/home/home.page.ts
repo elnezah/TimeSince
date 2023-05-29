@@ -5,8 +5,14 @@ import {
   StorageService,
   prefIndividualCard,
   prefIndividualReferenceDate,
+  prefMultipleCard,
+  prefMultipleReferenceDate,
 } from '../services/storage.service';
 import { SingleDateCard } from '../components/single-date/single-date.component';
+import {
+  MultipleDatesCard,
+  MultipleDatesDate,
+} from '../components/multiple-dates/multiple-dates.component';
 dayjs.extend(customParseFormat);
 
 @Component({
@@ -48,6 +54,10 @@ export class HomePage implements OnInit {
       },
     },
   ];
+  public referenceDatesMultiple: MultipleDatesDate[] = [];
+  public cardsMultiple: MultipleDatesCard[] = [];
+
+  public selectedTab: 'single' | 'multiple' = 'single';
 
   public constructor(private storageService: StorageService) {}
 
@@ -62,7 +72,15 @@ export class HomePage implements OnInit {
       this.cards = c as SingleDateCard[];
     }
 
-    console.log(HomePage.TAG, 'ngOnInit', {rd, c});
+    const rdMultiple = await this.storageService.get(prefMultipleReferenceDate);
+    if (rdMultiple && rdMultiple instanceof Array) {
+      this.referenceDatesMultiple = rdMultiple as MultipleDatesDate[];
+    }
+
+    const cMultiple = await this.storageService.get(prefMultipleCard);
+    if (cMultiple && cMultiple instanceof Array) {
+      this.cardsMultiple = cMultiple as MultipleDatesCard[];
+    }
   }
 
   //region Listeners
@@ -72,10 +90,12 @@ export class HomePage implements OnInit {
       prefIndividualReferenceDate,
       this.referenceDate.toISOString()
     );
+    await this.storageService.set(prefMultipleReferenceDate, this.cards);
   }
 
   public async onCardsChange(): Promise<void> {
     await this.storageService.set(prefIndividualCard, this.cards);
+    await this.storageService.set(prefMultipleCard, this.cardsMultiple);
   }
   //endregion
 }

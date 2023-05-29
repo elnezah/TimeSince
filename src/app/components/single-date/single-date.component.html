@@ -1,6 +1,6 @@
 <!-- Fist item (date picker) -->
 <ion-item>
-  <ion-label>Birth date</ion-label>
+  <ion-label>Reference date</ion-label>
   <ion-button id="date-picker-button" fill="clear" slot="end">
     {{referenceDate?.toISOString() | date: 'dd.MM.YYYY HH:mm'}}
   </ion-button>
@@ -12,7 +12,7 @@
 <ion-popover trigger="date-picker-button" #refDatePickerPopOver>
   <ng-template>
     <ion-datetime presentation="date-time" [value]="referenceDate?.toISOString()" size="cover"
-      (ionChange)="onReferenceDateChange($event)"></ion-datetime>
+      [showDefaultButtons]="true" (ionChange)="onReferenceDateChange($event)"></ion-datetime>
   </ng-template>
 </ion-popover>
 

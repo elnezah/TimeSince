@@ -4,9 +4,23 @@
       Blank
     </ion-title>
   </ion-toolbar>
+
+  <ion-segment [(ngModel)]="selectedTab">
+    <ion-segment-button value="single">
+      <ion-label>Single</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="multiple">
+      <ion-label>Multiple</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <app-single-date [(referenceDate)]="referenceDate" [(cards)]="cards"
-  (cardsChange)="onCardsChange()" (referenceDateChange)="onSingleDateReferenceDateChange()"></app-single-date>
+  <div [ngSwitch]="selectedTab">
+    <app-single-date *ngSwitchCase="'single'" [(referenceDate)]="referenceDate" [(cards)]="cards"
+      (cardsChange)="onCardsChange()" (referenceDateChange)="onSingleDateReferenceDateChange()"></app-single-date>
+
+    <app-multiple-dates [(referenceDates)]="referenceDatesMultiple" [(cards)]="cardsMultiple" *ngSwitchCase="'multiple'">
+    </app-multiple-dates>
+  </div>
 </ion-content>

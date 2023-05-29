@@ -1,0 +1,58 @@
+<!-- Fist item (date picker) -->
+<div>
+  <ng-container *ngFor="let date of referenceDates; index as index">
+    <ion-item>
+      <ion-input type="text" placeholder="Date name" [value]="date.name"></ion-input>
+      <ion-button id="date-picker-button{{date.id}}" fill="clear" slot="end">
+        {{date.date?.toISOString() | date: 'dd.MM.YYYY HH:mm'}}
+      </ion-button>
+
+      <ion-button (click)="onClickOnDeleteDate(index)" shape="round" slot="end" size="small" fill="outline" color="danger">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-popover trigger="date-picker-button{{date.id}}" #refDatePickerPopOver>
+      <ng-template>
+        <ion-datetime presentation="date-time" [value]="date.date?.toISOString()" size="cover"
+          [showDefaultButtons]="true" (ionChange)="onReferenceDateChange($event, index)"></ion-datetime>
+      </ng-template>
+    </ion-popover>
+  </ng-container>
+
+  <ion-button (click)="onClickOnAddReferenceDate()" expand="block" fill="outline" shape="round">
+    Add reference date
+  </ion-button>
+</div>
+
+<!-- Cards with future key dates -->
+<ion-card *ngFor="let card of cards; index as i">
+  <ion-card-header>
+    <ion-card-title>
+      <ion-toolbar>
+        <ion-badge [color]="isPast(card.date) ? 'danger' : 'success'" slot="start">
+          {{isPast(card.date) ? 'Past': 'Future'}}
+        </ion-badge>
+
+        <ion-title>{{card.title}}</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="danger" (click)="onClickOnRemoveCard(i)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    You {{isPast(card.date) ? 'reached': 'will reach'}} {{card.title}} on {{card.date?.toISOString() | date:
+    'dd.MM.YYYY'}}
+  </ion-card-content>
+
+</ion-card>
+
+<!-- Floating action button to add card -->
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="onClickOnAddCard()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
